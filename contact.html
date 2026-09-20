@@ -5,48 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BenAllDoh | Contact</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Poppins', 'sans-serif'] },
+                    colors: { twitch: '#9146FF', youtube: '#FF0000', darkBg: '#0b0f19', darkCard: '#151c2c' }
+                }
+            }
+        }
+    </script>
     <style>
-        body { background-color: #0f172a; color: #f8fafc; }
+        body { background-color: #0b0f19; color: #e2e8f0; }
+        .glow-text { text-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
     </style>
 </head>
-<body class="flex flex-col min-h-screen font-sans">
-    <nav class="bg-slate-900 p-4 border-b border-indigo-500">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="index.html" class="text-2xl font-bold text-indigo-400">BenAllDoh</a>
-            <ul class="flex space-x-6">
-                <li><a href="index.html" class="hover:text-indigo-400 transition">Home</a></li>
-                <li><a href="about.html" class="hover:text-indigo-400 transition">About</a></li>
-                <li><a href="stats.html" class="hover:text-indigo-400 transition">Stats</a></li>
-                <li><a href="wets.html" class="hover:text-indigo-400 transition">WETS</a></li>
-                <li><a href="contact.html" class="text-indigo-400">Contact</a></li>
-            </ul>
-        </div>
-    </nav>
+<body class="antialiased min-h-screen flex flex-col font-sans selection:bg-purple-500 selection:text-white">
 
-    <main class="flex-grow container mx-auto p-8 max-w-2xl text-center">
-        <h1 class="text-4xl font-bold mb-6 border-b border-slate-700 pb-2 text-indigo-400">Get In Touch</h1>
-        <div class="bg-slate-800 p-10 rounded-xl shadow-lg border border-slate-700">
-            <h2 class="text-2xl font-semibold mb-4 text-white">Business Inquiries</h2>
-            <p class="text-slate-300 mb-6">
-                For sponsorships, collaborations, and business opportunities, please reach out directly via email.
-            </p>
-            <a href="mailto:benalldoh@gmail.com" class="inline-block bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg shadow-indigo-500/30 text-xl">
-                benalldoh@gmail.com
-            </a>
-            
-            <div class="mt-10 pt-6 border-t border-slate-700">
-                <h3 class="text-lg font-semibold text-slate-400 mb-4">Other Ways to Connect</h3>
-                <div class="flex justify-center space-x-4">
-                    <a href="https://www.twitch.tv/benalldoh" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition underline">Twitch</a>
-                    <span class="text-slate-600">|</span>
-                    <a href="https://www.youtube.com/@BenAllDoh" target="_blank" class="text-indigo-400 hover:text-indigo-300 transition underline">YouTube</a>
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 bg-darkBg/90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <a href="index.html" class="flex-shrink-0 cursor-pointer">
+                    <h1 class="font-display font-black text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">
+                        BENALLDOH
+                    </h1>
+                </a>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="text-gray-400 hover:text-white px-3 py-2 text-sm font-semibold uppercase tracking-widest transition-colors">Home</a>
+                        <a href="about.html" class="text-gray-400 hover:text-white px-3 py-2 text-sm font-semibold uppercase tracking-widest transition-colors">About</a>
+                        <a href="stats.html" class="text-gray-400 hover:text-white px-3 py-2 text-sm font-semibold uppercase tracking-widest transition-colors">Stats</a>
+                        <a href="wets.html" class="text-gray-400 hover:text-white px-3 py-2 text-sm font-semibold uppercase tracking-widest transition-colors">WETS</a>
+                        <a href="contact.html" class="text-white border-b-2 border-purple-500 px-3 py-2 text-sm font-semibold uppercase tracking-widest">Contact</a>
+                    </div>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-400 hover:text-white focus:outline-none" aria-label="Toggle Navigation Menu">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
                 </div>
             </div>
         </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-darkCard border-b border-gray-800">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Home</a>
+                <a href="about.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">About</a>
+                <a href="stats.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Stats</a>
+                <a href="wets.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">WETS</a>
+                <a href="contact.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-purple-900/30">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-32 pb-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex flex-col justify-center">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h2 class="font-display font-black text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 glow-text uppercase">
+                Get In Touch
+            </h2>
+            <p class="text-gray-400 mt-3 text-lg">
+                For business inquiries, sponsorships, and collaborations
+            </p>
+            <div class="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <!-- Contact Cards Container -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+            
+            <!-- Business Email Card -->
+            <div class="bg-darkCard rounded-2xl p-8 border border-gray-800 shadow-xl flex flex-col justify-between hover:border-purple-500/40 transition-all">
+                <div>
+                    <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-2xl mb-6">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="text-2xl font-display font-bold text-white mb-2">Business Inquiries</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        Interested in working together or sponsoring a stream? Send an email directly to Ben's official inbox.
+                    </p>
+                    
+                    <div class="bg-darkBg border border-gray-800 rounded-xl p-4 flex items-center justify-between mb-6">
+                        <span class="font-mono text-purple-300 font-semibold text-sm sm:text-base truncate mr-2" id="email-text">
+                            benalldoh@gmail.com
+                        </span>
+                        <button onclick="copyEmail()" id="copy-btn" class="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 text-xs px-3 py-1.5 rounded-lg border border-purple-500/30 transition-all flex items-center shrink-0">
+                            <i class="fas fa-copy mr-1.5"></i> <span id="copy-label">Copy</span>
+                        </button>
+                    </div>
+                </div>
+
+                <a href="mailto:benalldoh@gmail.com" class="w-full inline-flex items-center justify-center px-6 py-3.5 text-base font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl shadow-lg transition-all transform active:scale-95 text-center">
+                    <i class="fas fa-paper-plane mr-2"></i> Send Email
+                </a>
+            </div>
+
+            <!-- Social Channels Card -->
+            <div class="bg-darkCard rounded-2xl p-8 border border-gray-800 shadow-xl flex flex-col justify-between hover:border-blue-500/40 transition-all">
+                <div>
+                    <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 text-2xl mb-6">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3 class="text-2xl font-display font-bold text-white mb-2">Official Channels</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        Catch the streams live or watch the latest video uploads on YouTube and Twitch.
+                    </p>
+
+                    <div class="space-y-4">
+                        <a href="https://twitch.tv/benalldoh" target="_blank" class="flex items-center justify-between p-4 bg-darkBg rounded-xl border border-gray-800 hover:border-twitch/50 transition-all group">
+                            <div class="flex items-center space-x-3">
+                                <i class="fab fa-twitch text-twitch text-2xl"></i>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm group-hover:text-purple-400 transition-colors">Twitch</h4>
+                                    <p class="text-xs text-gray-500">Live Streams & VODs</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-external-link-alt text-xs text-gray-500 group-hover:text-white transition-colors"></i>
+                        </a>
+
+                        <a href="https://youtube.com/@BenAllDoh" target="_blank" class="flex items-center justify-between p-4 bg-darkBg rounded-xl border border-gray-800 hover:border-youtube/50 transition-all group">
+                            <div class="flex items-center space-x-3">
+                                <i class="fab fa-youtube text-youtube text-2xl"></i>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm group-hover:text-red-400 transition-colors">YouTube</h4>
+                                    <p class="text-xs text-gray-500">Videos & Highlights</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-external-link-alt text-xs text-gray-500 group-hover:text-white transition-colors"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-800/80 text-center">
+                    <p class="text-xs text-gray-500">
+                        <i class="fas fa-shield-alt text-purple-400 mr-1"></i> Official verified accounts
+                    </p>
+                </div>
+            </div>
+
+        </div>
     </main>
 
-    <footer class="bg-slate-900 text-center p-4 text-sm text-slate-500 mt-auto">
-        &copy; 2026 BenAllDoh. All rights reserved.
+    <!-- Footer -->
+    <footer class="bg-darkBg border-t border-gray-800 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+            <div class="mb-4 md:mb-0 text-center md:text-left">
+                &copy; 2026 BenAllDoh. All rights reserved.
+            </div>
+            <div class="flex space-x-6 text-lg">
+                <a href="https://twitch.tv/benalldoh" target="_blank" class="hover:text-twitch transition-colors" aria-label="Twitch Channel"><i class="fab fa-twitch"></i></a>
+                <a href="https://youtube.com/@BenAllDoh" target="_blank" class="hover:text-youtube transition-colors" aria-label="YouTube Channel"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
     </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Copy Email function
+        function copyEmail() {
+            const email = "benalldoh@gmail.com";
+            navigator.clipboard.writeText(email).then(() => {
+                const label = document.getElementById('copy-label');
+                const btn = document.getElementById('copy-btn');
+                label.innerText = 'Copied!';
+                btn.classList.add('bg-green-600/30', 'text-green-300', 'border-green-500/50');
+                
+                setTimeout(() => {
+                    label.innerText = 'Copy';
+                    btn.classList.remove('bg-green-600/30', 'text-green-300', 'border-green-500/50');
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 </html>
