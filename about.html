@@ -5,49 +5,127 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BenAllDoh | About</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Poppins', 'sans-serif'] },
+                    colors: { twitch: '#9146FF', darkBg: '#0b0f19', darkCard: '#151c2c' }
+                }
+            }
+        }
+    </script>
     <style>
-        body { background-color: #0f172a; color: #f8fafc; }
+        body { background-color: #0b0f19; color: #e2e8f0; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen font-sans">
-    <nav class="bg-slate-900 p-4 border-b border-indigo-500">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="index.html" class="text-2xl font-bold text-indigo-400">BenAllDoh</a>
-            <ul class="flex space-x-6">
-                <li><a href="index.html" class="hover:text-indigo-400 transition">Home</a></li>
-                <li><a href="about.html" class="text-indigo-400">About</a></li>
-                <li><a href="stats.html" class="hover:text-indigo-400 transition">Stats</a></li>
-                <li><a href="wets.html" class="hover:text-indigo-400 transition">WETS</a></li>
-                <li><a href="contact.html" class="hover:text-indigo-400 transition">Contact</a></li>
-            </ul>
+<body class="antialiased min-h-screen flex flex-col font-sans selection:bg-purple-500 selection:text-white">
+
+    <nav class="fixed w-full z-50 bg-darkBg/90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <a href="index.html" class="flex-shrink-0 cursor-pointer">
+                    <h1 class="font-display font-black text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">
+                        BENALLDOH
+                    </h1>
+                </a>
+                
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="text-gray-400 hover:text-white px-3 py-2 text-sm font-semibold uppercase tracking-widest transition-colors">Home</a>
+                        <a href="about.html" class="text-white border-b-2 border-purple-500 px-3 py-2 text-sm font-semibold uppercase tracking-widest">About</a>
+                        <a href="stats.html" class="text-gray-400 hover:text-white px-3 py-2 text-sm font-semibold uppercase tracking-widest transition-colors">Stats</a>
+                        <a href="wets.html" class="text-gray-400 hover:text-white px-3 py-2 text-sm font-semibold uppercase tracking-widest transition-colors">WETS</a>
+                        <a href="contact.html" class="text-gray-400 hover:text-white px-3 py-2 text-sm font-semibold uppercase tracking-widest transition-colors">Contact</a>
+                    </div>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-400 hover:text-white focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-darkCard border-b border-gray-800">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Home</a>
+                <a href="about.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white bg-purple-900/30">About</a>
+                <a href="stats.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Stats</a>
+                <a href="wets.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">WETS</a>
+                <a href="contact.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Contact</a>
+            </div>
         </div>
     </nav>
 
-    <main class="flex-grow container mx-auto p-8 max-w-4xl">
-        <h1 class="text-4xl font-bold mb-6 border-b border-slate-700 pb-2 text-indigo-400">About BenAllDoh</h1>
-        <div class="bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-700 leading-relaxed text-lg text-slate-300">
-            <p class="mb-4">
-                Hey! I'm <strong>BenAllDoh</strong>, a Canadian content creator and Twitch Affiliate.
-            </p>
-            <p class="mb-4">
-                I'm a streamer who mainly plays <strong>Geometry Dash</strong>, <strong>Minecraft</strong>, and <strong>Gartic Phone</strong>. I love hanging out with chat, doing GD level requests with Globed, and messing around on the Ben SMP.
-            </p>
-            <p class="mb-4">
-                My motto is pretty simple: <em>"I think I'm cool but I don't know."</em> 
-            </p>
-            <h3 class="text-2xl font-semibold mt-8 mb-4 text-purple-400">My Gear Setup</h3>
-            <ul class="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Microphone:</strong> Razer Seiren V3 Mini</li>
-                <li><strong>Webcam:</strong> JLab JBuds Cam</li>
-                <li><strong>Monitor:</strong> Samsung Odyssey G5 27"</li>
-                <li><strong>Mouse:</strong> Bloody A70x Optical Gaming Mouse</li>
-                <li><strong>Keyboard:</strong> Klim Chroma Keyboard</li>
-            </ul>
+    <main class="flex-grow pt-32 pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div class="text-center mb-16">
+            <h2 class="font-display font-black text-4xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">ABOUT BENALLDOH</h2>
+            <div class="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <!-- Bio Section -->
+            <div class="space-y-6 text-lg text-gray-300 leading-relaxed">
+                <p>
+                    <span class="text-white font-bold">BenAllDoh</span> is a content creator and Twitch streamer based in Canada that primarily streams <strong class="text-white">Geometry Dash</strong>. He officially started his current channel on <span class="text-white font-semibold">December 28, 2025</span>.
+                </p>
+                <p>
+                    Born on March 16, 2011, BenAllDoh has had an interest in YouTube since the age of 4. When he was 6, inspired by other YouTubers like <strong class="text-white">DanTDM</strong> and <strong class="text-white">PopularMMOs</strong>, he started his first YouTube channel, where he obtained 600 subscribers.
+                </p>
+                <p>
+                    When he was 12, he started a CapCut account, helping him learn about short form content and how to make it. The CapCut account gathered <strong class="text-purple-400">25,000+ followers</strong> before he quit. When BenAllDoh was 14, he started streaming on Twitch, where all of this started.
+                </p>
+
+                <!-- Family Support Box -->
+                <div class="mt-8 p-6 bg-darkCard border border-gray-800 rounded-xl shadow-lg">
+                    <h4 class="text-white font-display font-bold mb-4 flex items-center">
+                        <i class="fas fa-heart text-red-500 mr-3"></i> Family Support
+                    </h4>
+                    <div class="space-y-4 text-base">
+                        <p>
+                            <strong class="text-white">MomAllDoh</strong>, Ben's mother, has supported him throughout his journey. She spent time making Ben's profile picture for his first channel, and has stayed engaged and intrigued in all of Ben's social media accounts over the past decade.
+                        </p>
+                        <p>
+                            <strong class="text-white">BroAllDoh</strong> has been watching his brother for the past 10 years too, and BenAllDoh can recall BroAllDoh laughing at his video, which really motivated Ben at the time.
+                        </p>
+                        <p>
+                            <strong class="text-white">DadAllDoh</strong> has also contributed, helping Ben make thumbnails and descriptions when he was 7.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-8 sticky top-32">
+                <div class="bg-darkCard rounded-2xl p-6 border border-gray-800 shadow-xl">
+                    <h3 class="text-xl font-display font-bold text-white mb-6 flex items-center">
+                        <i class="fas fa-gamepad text-blue-400 mr-3"></i> Main Games
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-4 py-2 bg-darkBg border border-gray-700 rounded-full text-sm font-semibold text-gray-300 hover:border-purple-500 transition-colors">Geometry Dash</span>
+                        <span class="px-4 py-2 bg-darkBg border border-gray-700 rounded-full text-sm font-semibold text-gray-300 hover:border-purple-500 transition-colors">Minecraft</span>
+                        <span class="px-4 py-2 bg-darkBg border border-gray-700 rounded-full text-sm font-semibold text-gray-300 hover:border-purple-500 transition-colors">Gartic Phone</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
-    <footer class="bg-slate-900 text-center p-4 text-sm text-slate-500 mt-auto">
-        &copy; 2026 BenAllDoh. All rights reserved.
+    <footer class="bg-darkBg border-t border-gray-800 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+            <div class="mb-4 md:mb-0 text-center md:text-left">
+                &copy; 2026 BenAllDoh. All rights reserved.
+            </div>
+        </div>
     </footer>
+    <script>
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+    </script>
 </body>
 </html>
