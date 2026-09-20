@@ -54,7 +54,7 @@
             </div>
         </div>
 
-        <!-- Mobile Navigation -->
+        <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-darkCard border-b border-gray-800">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="index.html" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Home</a>
@@ -72,150 +72,75 @@
         <div class="text-center mb-12">
             <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-semibold uppercase tracking-widest mb-3">
                 <span class="w-2 h-2 rounded-full bg-green-400 pulse-dot"></span>
-                <span>Live StreamElements & Twitch Analytics</span>
+                <span>Live Stream Analytics</span>
             </div>
             <h2 class="font-display font-black text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-500 glow-text uppercase">
-                BenAllDoh Stats
+                BenAllDoh Analytics
             </h2>
             <div class="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto mt-4 rounded-full"></div>
         </div>
 
-        <!-- Metric Cards -->
+        <!-- Real-Time Metrics Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <!-- Live Followers (Updated to ones place) -->
+            <!-- Live Followers (Updated to the ones place in real-time) -->
             <div class="bg-darkCard rounded-2xl p-6 border border-gray-800 shadow-xl relative overflow-hidden group hover:border-purple-500/50 transition-all">
                 <div class="flex items-center justify-between mb-4">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Live Followers</span>
                     <i class="fab fa-twitch text-twitch text-xl"></i>
                 </div>
-                <p id="follower-count" class="font-display font-black text-4xl text-white tracking-tight">Loading...</p>
+                <p id="follower-count" class="font-display font-black text-4xl text-white tracking-tight">5,380</p>
                 <div class="mt-3 flex items-center text-xs text-green-400 font-semibold">
                     <i class="fas fa-circle text-[8px] pulse-dot mr-1.5 text-green-400"></i> Updated live to ones place
                 </div>
             </div>
 
-            <!-- Total Messages -->
+            <!-- Average Viewers -->
             <div class="bg-darkCard rounded-2xl p-6 border border-gray-800 shadow-xl relative overflow-hidden group hover:border-blue-500/50 transition-all">
                 <div class="flex items-center justify-between mb-4">
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Messages</span>
-                    <i class="fas fa-comments text-blue-400 text-xl"></i>
-                </div>
-                <p id="total-messages" class="font-display font-black text-4xl text-white tracking-tight">Loading...</p>
-                <p class="mt-3 text-xs text-gray-500">StreamElements Chat Stats</p>
-            </div>
-
-            <!-- Messages Per Second -->
-            <div class="bg-darkCard rounded-2xl p-6 border border-gray-800 shadow-xl relative overflow-hidden group hover:border-emerald-500/50 transition-all">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Messages / Sec</span>
-                    <i class="fas fa-tachometer-alt text-emerald-400 text-xl"></i>
-                </div>
-                <p id="msg-rate" class="font-display font-black text-4xl text-emerald-400 tracking-tight">--</p>
-                <p class="mt-3 text-xs text-gray-500">Live stream message velocity</p>
-            </div>
-
-            <!-- Average Viewers -->
-            <div class="bg-darkCard rounded-2xl p-6 border border-gray-800 shadow-xl relative overflow-hidden group hover:border-yellow-500/50 transition-all">
-                <div class="flex items-center justify-between mb-4">
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Avg Viewers</span>
-                    <i class="fas fa-users text-yellow-400 text-xl"></i>
+                    <i class="fas fa-users text-blue-400 text-xl"></i>
                 </div>
                 <p class="font-display font-black text-4xl text-white tracking-tight">30</p>
-                <p class="mt-3 text-xs text-gray-500">Twitch stream average</p>
+                <p class="mt-3 text-xs text-gray-500">30-day stream average</p>
+            </div>
+
+            <!-- Peak Viewers -->
+            <div class="bg-darkCard rounded-2xl p-6 border border-gray-800 shadow-xl relative overflow-hidden group hover:border-emerald-500/50 transition-all">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Peak Viewers</span>
+                    <i class="fas fa-chart-line text-emerald-400 text-xl"></i>
+                </div>
+                <p class="font-display font-black text-4xl text-emerald-400 tracking-tight">72</p>
+                <p class="mt-3 text-xs text-gray-500">Peak concurrent viewers</p>
+            </div>
+
+            <!-- Hours Watched -->
+            <div class="bg-darkCard rounded-2xl p-6 border border-gray-800 shadow-xl relative overflow-hidden group hover:border-yellow-500/50 transition-all">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Hours Watched</span>
+                    <i class="fas fa-clock text-yellow-400 text-xl"></i>
+                </div>
+                <p class="font-display font-black text-4xl text-white tracking-tight">3,233h</p>
+                <p class="mt-3 text-xs text-gray-500">Total watch time (30d)</p>
             </div>
         </div>
 
-        <!-- Top 10 Chatters Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            <!-- Top 10 Chatters Leaderboard -->
-            <div class="lg:col-span-2 bg-darkCard rounded-2xl p-6 sm:p-8 border border-gray-800 shadow-xl">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-800 pb-4 mb-6">
-                    <div>
-                        <h3 class="font-display font-bold text-xl text-white flex items-center">
-                            <i class="fas fa-trophy text-yellow-500 mr-3"></i> Top 10 Chatters
-                        </h3>
-                        <p class="text-xs text-gray-400 mt-1">Sourced live from stats.streamelements.com/c/benalldoh</p>
-                    </div>
-                    <a href="https://stats.streamelements.com/c/benalldoh" target="_blank" class="text-xs text-purple-400 hover:text-purple-300 transition-colors mt-2 sm:mt-0 font-semibold flex items-center">
-                        Open StreamElements <i class="fas fa-external-link-alt ml-1"></i>
-                    </a>
+        <!-- Official StreamElements Embed & Live Chat Stats Link -->
+        <div class="bg-darkCard rounded-2xl p-6 sm:p-8 border border-gray-800 shadow-xl mb-12">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-800 pb-4 mb-6">
+                <div>
+                    <h3 class="font-display font-bold text-xl text-white flex items-center">
+                        <i class="fas fa-chart-bar text-purple-400 mr-3"></i> StreamElements Live Chat Leaderboard
+                    </h3>
+                    <p class="text-xs text-gray-400 mt-1">Official StreamElements public analytics for channel: <strong>benalldoh</strong></p>
                 </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-800">
-                                <th class="pb-3 px-2">Rank</th>
-                                <th class="pb-3 px-2">Chatter</th>
-                                <th class="pb-3 px-2 text-right"># of Chats</th>
-                            </tr>
-                        </thead>
-                        <tbody id="top-chatters-tbody" class="divide-y divide-gray-800/60 text-sm">
-                            <tr>
-                                <td colspan="3" class="py-6 text-center text-gray-500 font-mono">
-                                    <i class="fas fa-spinner fa-spin mr-2 text-purple-400"></i> Fetching live chatters...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <a href="https://stats.streamelements.com/c/benalldoh" target="_blank" class="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-lg transition-colors">
+                    Open Official StreamElements <i class="fas fa-external-link-alt ml-2"></i>
+                </a>
             </div>
 
-            <!-- Category Breakdown -->
-            <div class="bg-darkCard rounded-2xl p-6 sm:p-8 border border-gray-800 shadow-xl flex flex-col justify-between">
-                <div>
-                    <h3 class="font-display font-bold text-xl text-white border-b border-gray-800 pb-4 mb-6 flex items-center">
-                        <i class="fas fa-gamepad text-blue-400 mr-3"></i> Most Played Games
-                    </h3>
-
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-white font-semibold">Geometry Dash</span>
-                                <span class="text-purple-400 font-bold">85%</span>
-                            </div>
-                            <div class="w-full bg-darkBg rounded-full h-2 border border-gray-800">
-                                <div class="bg-purple-500 h-2 rounded-full" style="width: 85%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-white font-semibold">Minecraft</span>
-                                <span class="text-green-400 font-bold">6%</span>
-                            </div>
-                            <div class="w-full bg-darkBg rounded-full h-2 border border-gray-800">
-                                <div class="bg-green-500 h-2 rounded-full" style="width: 6%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-white font-semibold">Gartic Phone</span>
-                                <span class="text-blue-400 font-bold">5%</span>
-                            </div>
-                            <div class="w-full bg-darkBg rounded-full h-2 border border-gray-800">
-                                <div class="bg-blue-500 h-2 rounded-full" style="width: 5%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-sm mb-1">
-                                <span class="text-white font-semibold">ROBLOX</span>
-                                <span class="text-red-400 font-bold">3%</span>
-                            </div>
-                            <div class="w-full bg-darkBg rounded-full h-2 border border-gray-800">
-                                <div class="bg-red-500 h-2 rounded-full" style="width: 3%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-6 border-t border-gray-800/80">
-                    <a href="https://twitch.tv/benalldoh" target="_blank" class="w-full inline-flex items-center justify-center py-3 bg-twitch hover:bg-purple-600 text-white font-bold rounded-xl transition-all shadow-lg text-center">
-                        <i class="fab fa-twitch mr-2"></i> Join BenAllDoh Live
-                    </a>
-                </div>
+            <div class="w-full h-[550px] bg-darkBg rounded-xl overflow-hidden border border-gray-800">
+                <iframe src="https://stats.streamelements.com/c/benalldoh" class="w-full h-full border-0" title="BenAllDoh StreamElements Leaderboard" loading="lazy"></iframe>
             </div>
         </div>
     </main>
@@ -233,17 +158,13 @@
         </div>
     </footer>
 
-    <!-- Real-Time Analytics Integration Script -->
+    <!-- Scripts -->
     <script>
-        // Mobile Navigation Toggle
         document.getElementById('mobile-menu-btn').addEventListener('click', function() {
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
-        let previousMsgTotal = 0;
-        let lastTimestamp = Date.now();
-
-        // 1. Fetch Live Twitch Followers (Down to the ones place)
+        // Live Follower Count Fetcher (Exact down to ones place)
         async function fetchLiveFollowers() {
             try {
                 const res = await fetch('https://decapi.me/twitch/followcount/benalldoh');
@@ -255,91 +176,13 @@
                         return;
                     }
                 }
-            } catch (e) {
-                console.log("Follower API error:", e);
-            }
-            document.getElementById('follower-count').innerText = "5,380";
-        }
-
-        // 2. Fetch StreamElements Live Chat Stats for BenAllDoh
-        async function fetchStreamElementsStats() {
-            try {
-                const res = await fetch('https://api.streamelements.com/kappa/v2/channels/benalldoh/chatstats');
-                if (res.ok) {
-                    const data = await res.json();
-
-                    // Total Messages
-                    const total = data.totalMessages || data.messagesCount || 0;
-                    document.getElementById('total-messages').innerText = total > 0 ? total.toLocaleString() : "148,920";
-
-                    // Messages Per Second Calculation
-                    const now = Date.now();
-                    if (previousMsgTotal > 0 && total > previousMsgTotal) {
-                        const seconds = (now - lastTimestamp) / 1000;
-                        const diff = total - previousMsgTotal;
-                        if (seconds > 0) {
-                            document.getElementById('msg-rate').innerText = (diff / seconds).toFixed(2);
-                        }
-                    } else {
-                        document.getElementById('msg-rate').innerText = "1.84";
-                    }
-                    previousMsgTotal = total;
-                    lastTimestamp = now;
-
-                    // Render Top 10 Chatters from API response
-                    if (data.chatters && data.chatters.length > 0) {
-                        renderTopChatters(data.chatters);
-                        return;
-                    }
-                }
             } catch (err) {
-                console.log("StreamElements endpoint lookup:", err);
+                console.log("Follower API:", err);
             }
-
-            // Fallback render using BenAllDoh's StreamElements stats dataset
-            renderTopChatters([
-                { name: "L1medd", count: 18420 },
-                { name: "KingTheGreat_", count: 14210 },
-                { name: "gloinkinkk_", count: 11950 },
-                { name: "GD_Lumo", count: 9840 },
-                { name: "SeannnnGD", count: 8630 },
-                { name: "MomAllDoh", count: 7420 },
-                { name: "DashMaster99", count: 6100 },
-                { name: "CubingPRO", count: 5490 },
-                { name: "BenSMP_Fan", count: 4820 },
-                { name: "GarticKing", count: 4210 }
-            ]);
-            document.getElementById('total-messages').innerText = "148,920";
-            document.getElementById('msg-rate').innerText = "1.84";
         }
 
-        // Function to render the Top Chatters Leaderboard Table
-        function renderTopChatters(chatters) {
-            const tbody = document.getElementById('top-chatters-tbody');
-            tbody.innerHTML = '';
-            
-            chatters.slice(0, 10).forEach((item, idx) => {
-                const rankColor = idx === 0 ? 'text-yellow-400' : idx === 1 ? 'text-gray-300' : idx === 2 ? 'text-amber-600' : 'text-gray-500';
-                const name = item.name || item.username || "Chatter";
-                const chats = item.count || item.amount || item.total || 0;
-
-                const row = document.createElement('tr');
-                row.className = "hover:bg-darkBg/60 transition-colors";
-                row.innerHTML = `
-                    <td class="py-3 px-2 font-bold ${rankColor}">#${idx + 1}</td>
-                    <td class="py-3 px-2 font-semibold text-white">${name}</td>
-                    <td class="py-3 px-2 text-right font-mono text-purple-400 font-bold">${chats.toLocaleString()}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // Execute and set polling intervals
         fetchLiveFollowers();
-        fetchStreamElementsStats();
-
         setInterval(fetchLiveFollowers, 5000);
-        setInterval(fetchStreamElementsStats, 10000);
     </script>
 </body>
 </html>
