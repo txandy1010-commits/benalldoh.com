@@ -7,8 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@500;700;900&display=swap" rel="stylesheet">
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase JS Client (v2 UMD) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -75,7 +75,7 @@
         <div class="text-center mb-12">
             <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-semibold uppercase tracking-widest mb-3">
                 <span class="w-2 h-2 rounded-full bg-green-400 pulse-dot"></span>
-                <span>Live Supabase Cloud Sync</span>
+                <span id="conn-status">Connecting to Supabase Cloud...</span>
             </div>
             <h2 class="font-display font-black text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-500 glow-text uppercase">
                 BenAllDoh Live Stats
@@ -93,7 +93,7 @@
                 </div>
                 <p id="follower-count" class="font-display font-black text-4xl text-white tracking-tight">--</p>
                 <div class="mt-3 flex items-center text-xs text-green-400 font-semibold">
-                    <i class="fas fa-circle text-[8px] pulse-dot mr-1.5 text-green-400"></i> Updated live to ones place
+                    <i class="fas fa-circle text-[8px] pulse-dot mr-1.5 text-green-400"></i> Live updating to ones place
                 </div>
             </div>
 
@@ -105,7 +105,7 @@
                 </div>
                 <p id="total-messages" class="font-display font-black text-4xl text-white tracking-tight">--</p>
                 <p class="mt-3 text-xs text-emerald-400 font-semibold flex items-center">
-                    <i class="fas fa-bolt mr-1"></i> Supabase Database Connected
+                    <i class="fas fa-bolt mr-1"></i> Supabase Database Active
                 </p>
             </div>
 
@@ -153,7 +153,7 @@
                     <tbody id="top-chatters-tbody" class="divide-y divide-gray-800/60 text-sm">
                         <tr>
                             <td colspan="3" class="py-8 text-center text-gray-500 font-mono">
-                                <i class="fas fa-circle-notch fa-spin mr-2 text-purple-400"></i> Syncing with Supabase Cloud...
+                                <i class="fas fa-circle-notch fa-spin mr-2 text-purple-400"></i> Connecting to Supabase Cloud...
                             </td>
                         </tr>
                     </tbody>
@@ -177,11 +177,14 @@
 
     <!-- Supabase Integration Script -->
     <script>
-        // Supabase Project Credentials
         const SUPABASE_URL = 'https://tsowxzeozeifruvwryhe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzb3d4emVvemVpZnJ1dndyeWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5NDU3ODQsImV4cCI6MjEwNTUyMTc4NH0.qZiNivry3s0XCKxZr4DMcuBx1pppWadoVYwqT4yCAEc';
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Correct CDN Browser Initialization
+        let supabaseClient = null;
+        if (window.supabase && window.supabase.createClient) {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
 
         document.getElementById('mobile-menu-btn').addEventListener('click', function() {
             document.getElementById('mobile-menu').classList.toggle('hidden');
@@ -190,7 +193,7 @@
         let recentMessages = [];
         let totalMessagesCount = 148920;
 
-        // Fetch Live Twitch Followers (Down to the ones place)
+        // Fetch Live Twitch Followers
         async function fetchLiveFollowers() {
             try {
                 const res = await fetch('https://decapi.me/twitch/followcount/benalldoh');
@@ -206,11 +209,17 @@
             }
         }
 
-        // Fetch Global Leaderboard & Message Count from Supabase
+        // Fetch Data from Supabase
         async function fetchSupabaseData() {
+            if (!supabaseClient) {
+                document.getElementById('conn-status').innerText = "Supabase JS SDK Missing";
+                renderFallbackTable();
+                return;
+            }
+
             try {
-                // Total Messages
-                const { data: statsData } = await supabase
+                // Fetch Total Messages
+                const { data: statsData, error: statsErr } = await supabaseClient
                     .from('channel_stats')
                     .select('stat_value')
                     .eq('stat_key', 'total_messages')
@@ -221,12 +230,21 @@
                     document.getElementById('total-messages').innerText = Number(totalMessagesCount).toLocaleString();
                 }
 
-                // Top 10 Chatters
-                const { data: topChatters } = await supabase
+                // Fetch Top Chatters
+                const { data: topChatters, error: chattersErr } = await supabaseClient
                     .from('chatters')
                     .select('display_name, chat_count')
                     .order('chat_count', { ascending: false })
                     .limit(10);
+
+                if (chattersErr) {
+                    console.log("Chatters Error:", chattersErr);
+                    document.getElementById('conn-status').innerText = "Supabase Table Error: Run SQL Script";
+                    renderFallbackTable();
+                    return;
+                }
+
+                document.getElementById('conn-status').innerText = "Live Supabase Sync Active";
 
                 if (topChatters && topChatters.length > 0) {
                     renderTable(topChatters);
@@ -234,24 +252,27 @@
                     renderFallbackTable();
                 }
             } catch (err) {
-                console.log("Supabase Fetch Error:", err);
+                console.log("Supabase Connection Error:", err);
+                document.getElementById('conn-status').innerText = "Database Connection Failed";
                 renderFallbackTable();
             }
         }
 
-        // Increment & Save Chat to Supabase Database
+        // Log Chat Message to Supabase
         async function logChatToSupabase(username, displayName) {
             totalMessagesCount++;
             document.getElementById('total-messages').innerText = Number(totalMessagesCount).toLocaleString();
 
+            if (!supabaseClient) return;
+
             try {
-                // Increment Total Messages
-                await supabase
+                // Update message counter
+                await supabaseClient
                     .from('channel_stats')
                     .upsert({ stat_key: 'total_messages', stat_value: totalMessagesCount });
 
-                // Fetch Chatter Current Count
-                const { data } = await supabase
+                // Check chatter count
+                const { data } = await supabaseClient
                     .from('chatters')
                     .select('chat_count')
                     .eq('username', username.toLowerCase())
@@ -259,8 +280,8 @@
 
                 const currentCount = data ? data.chat_count : 0;
 
-                // Upsert Chatter
-                await supabase
+                // Upsert chatter record
+                await supabaseClient
                     .from('chatters')
                     .upsert({
                         username: username.toLowerCase(),
@@ -269,13 +290,13 @@
                         last_updated: new Date().toISOString()
                     });
 
-                fetchSupabaseData(); // Re-sync ranking globally
+                fetchSupabaseData();
             } catch (err) {
-                console.log("Supabase Update Error:", err);
+                console.log("Supabase Log Error:", err);
             }
         }
 
-        // Twitch Live IRC WebSocket
+        // Twitch Live IRC Connection
         function connectTwitchIRC() {
             const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
 
@@ -357,7 +378,7 @@
         connectTwitchIRC();
 
         setInterval(fetchLiveFollowers, 5000);
-        setInterval(fetchSupabaseData, 10000); // Poll Supabase every 10s for multi-device sync
+        setInterval(fetchSupabaseData, 10000);
         setInterval(updateMPS, 1000);
     </script>
 </body>
