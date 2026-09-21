@@ -212,7 +212,7 @@
         // Fetch Data from Supabase
         async function fetchSupabaseData() {
             if (!supabaseClient) {
-                document.getElementById('conn-status').innerText = "Supabase JS SDK Missing";
+                document.getElementById('conn-status').innerText = "Error Can't Connect to Servers";
                 renderFallbackTable();
                 return;
             }
