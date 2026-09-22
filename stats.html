@@ -173,7 +173,9 @@
         </div>
     </footer>
 
-    <!-- Supabase + Twitch Realtime Script -->
+   <!-- Supabase + Twitch Realtime Script (Optimized for High Velocity) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
     <script>
         const SUPABASE_URL = 'https://tsowxzeozeifruvwryhe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzb3d4emVvemVpZnJ1dndyeWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5NDU3ODQsImV4cCI6MjEwNTUyMTc4NH0.qZiNivry3s0XCKxZr4DMcuBx1pppWadoVYwqT4yCAEc';
@@ -188,9 +190,10 @@
         });
 
         let recentMessages = [];
-        let localTotalCount = 821531;
+        let localTotalCount = 821570;
+        let isFetching = false;
 
-        // 1. Fetch Live Followers from DecAPI
+        // 1. Fetch Live Followers
         async function fetchLiveFollowers() {
             try {
                 const res = await fetch('https://decapi.me/twitch/followcount/benalldoh');
@@ -206,15 +209,12 @@
             }
         }
 
-        // 2. Fetch Database Stats from Supabase
+        // 2. Fetch Global Database Stats
         async function fetchSupabaseData() {
-            if (!supabaseClient) {
-                renderFallbackTable();
-                return;
-            }
+            if (!supabaseClient || isFetching) return;
+            isFetching = true;
 
             try {
-                // Fetch Total Messages
                 const { data: statsData } = await supabaseClient
                     .from('channel_stats')
                     .select('stat_value')
@@ -222,11 +222,14 @@
                     .maybeSingle();
 
                 if (statsData && statsData.stat_value) {
-                    localTotalCount = Number(statsData.stat_value);
-                    document.getElementById('total-messages').innerText = localTotalCount.toLocaleString();
+                    // Only update if server value is higher than local estimate
+                    const dbCount = Number(statsData.stat_value);
+                    if (dbCount > localTotalCount) {
+                        localTotalCount = dbCount;
+                        document.getElementById('total-messages').innerText = localTotalCount.toLocaleString();
+                    }
                 }
 
-                // Fetch Top 10 Chatters from your seeded list
                 const { data: topChatters, error: chattersErr } = await supabaseClient
                     .from('chatters')
                     .select('display_name, chat_count')
@@ -236,62 +239,33 @@
                 if (!chattersErr && topChatters && topChatters.length > 0) {
                     document.getElementById('conn-status').innerText = "Live Supabase Sync Active";
                     renderTable(topChatters);
-                } else {
-                    document.getElementById('conn-status').innerText = "Database Connected";
-                    renderFallbackTable();
                 }
             } catch (err) {
                 console.error("Supabase fetch error:", err);
-                renderFallbackTable();
+            } finally {
+                isFetching = false;
             }
         }
 
-        // 3. Log Chat Message Live to Supabase
+        // 3. High-Speed Chat Logging with Atomic RPC
         async function logChatToSupabase(username, displayName) {
+            // Immediate local counter feedback
             localTotalCount++;
             document.getElementById('total-messages').innerText = localTotalCount.toLocaleString();
 
             if (!supabaseClient) return;
 
-            try {
-                // Try RPC atomic function first
-                const { error: rpcErr } = await supabaseClient.rpc('increment_chatter', {
-                    p_username: username.toLowerCase(),
-                    p_display_name: displayName
-                });
+            // Execute fire-and-forget atomic increment
+            supabaseClient.rpc('increment_chatter', {
+                p_username: username.toLowerCase(),
+                p_display_name: displayName
+            }).catch(err => console.error("Chatter RPC Error:", err));
 
-                if (!rpcErr) {
-                    await supabaseClient.rpc('increment_total_messages');
-                } else {
-                    // Fallback to direct client update
-                    const { data } = await supabaseClient
-                        .from('chatters')
-                        .select('chat_count')
-                        .eq('username', username.toLowerCase())
-                        .maybeSingle();
-
-                    const currentCount = data ? data.chat_count : 0;
-
-                    await supabaseClient.from('chatters').upsert({
-                        username: username.toLowerCase(),
-                        display_name: displayName,
-                        chat_count: currentCount + 1,
-                        last_updated: new Date().toISOString()
-                    });
-
-                    await supabaseClient.from('channel_stats').upsert({
-                        stat_key: 'total_messages',
-                        stat_value: localTotalCount
-                    });
-                }
-
-                fetchSupabaseData();
-            } catch (err) {
-                console.error("Chat log error:", err);
-            }
+            supabaseClient.rpc('increment_total_messages')
+                .catch(err => console.error("Total RPC Error:", err));
         }
 
-        // 4. Connect to Live Twitch Chat IRC
+        // 4. Twitch IRC Listener
         function connectTwitchIRC() {
             const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
 
@@ -302,27 +276,31 @@
             };
 
             socket.onmessage = function(event) {
-                const message = event.data;
+                const raw = event.data;
 
-                if (message.startsWith('PING')) {
+                if (raw.startsWith('PING')) {
                     socket.send('PONG :tmi.twitch.tv');
                     return;
                 }
 
-                if (message.includes('PRIVMSG #benalldoh')) {
-                    let displayName = "Anonymous";
+                // Handle batched IRC lines split by newline
+                const lines = raw.split('\r\n');
+                lines.forEach(message => {
+                    if (message.includes('PRIVMSG #benalldoh')) {
+                        let displayName = "Anonymous";
 
-                    const tagMatch = message.match(/display-name=([^;]+)/);
-                    if (tagMatch && tagMatch[1]) {
-                        displayName = tagMatch[1];
-                    } else {
-                        const userMatch = message.match(/:([^!]+)!/);
-                        if (userMatch && userMatch[1]) displayName = userMatch[1];
+                        const tagMatch = message.match(/display-name=([^;]+)/);
+                        if (tagMatch && tagMatch[1]) {
+                            displayName = tagMatch[1];
+                        } else {
+                            const userMatch = message.match(/:([^!]+)!/);
+                            if (userMatch && userMatch[1]) displayName = userMatch[1];
+                        }
+
+                        recentMessages.push(Date.now());
+                        logChatToSupabase(displayName.toLowerCase(), displayName);
                     }
-
-                    recentMessages.push(Date.now());
-                    logChatToSupabase(displayName.toLowerCase(), displayName);
-                }
+                });
             };
 
             socket.onclose = function() { 
@@ -360,22 +338,17 @@
                 { display_name: "mubylootgmd", chat_count: 62774 },
                 { display_name: "consumptionofcheese", chat_count: 61678 },
                 { display_name: "gdreqbot", chat_count: 53153 },
-                { display_name: "shadowgd___", chat_count: 34600 },
-                { display_name: "txandy10", chat_count: 28141 },
-                { display_name: "munchiproductions", chat_count: 24077 },
-                { display_name: "als_stuff_6", chat_count: 21847 },
-                { display_name: "shadowpumpkinwoah", chat_count: 18094 },
-                { display_name: "definitely_not_a_ferret", chat_count: 16333 }
+                { display_name: "shadowgd___", chat_count: 34600 }
             ]);
         }
 
-        // Initialize Startup
+        // Init
         fetchLiveFollowers();
         fetchSupabaseData();
         connectTwitchIRC();
 
         setInterval(fetchLiveFollowers, 10000);
-        setInterval(fetchSupabaseData, 8000);
+        setInterval(fetchSupabaseData, 10000); // Poll database every 10s to sync Leaderboard
         setInterval(updateMPS, 1000);
     </script>
 </body>
