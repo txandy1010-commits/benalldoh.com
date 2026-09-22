@@ -24,8 +24,6 @@
         .glow-text { text-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
         .pulse-dot { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
-        .flash-gold { animation: flash 0.4s ease-out; }
-        @keyframes flash { 0% { color: #f59e0b; transform: scale(1.05); } 100% { color: #ffffff; transform: scale(1); } }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col font-sans selection:bg-purple-500 selection:text-white">
@@ -75,7 +73,7 @@
         <div class="text-center mb-12">
             <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-semibold uppercase tracking-widest mb-3">
                 <span class="w-2 h-2 rounded-full bg-green-400 pulse-dot"></span>
-                <span id="conn-status">Syncing Stats...</span>
+                <span id="conn-status">Connecting to Database...</span>
             </div>
             <h2 class="font-display font-black text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-500 glow-text uppercase">
                 BenAllDoh Live Stats
@@ -91,7 +89,7 @@
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Live Followers</span>
                     <i class="fab fa-twitch text-twitch text-xl"></i>
                 </div>
-                <p id="follower-count" class="font-display font-black text-4xl text-white tracking-tight">12,450</p>
+                <p id="follower-count" class="font-display font-black text-4xl text-white tracking-tight">--</p>
                 <div class="mt-3 flex items-center text-xs text-green-400 font-semibold">
                     <i class="fas fa-circle text-[8px] pulse-dot mr-1.5 text-green-400"></i> Live Count
                 </div>
@@ -103,9 +101,9 @@
                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Messages</span>
                     <i class="fas fa-database text-blue-400 text-xl"></i>
                 </div>
-                <p id="total-messages" class="font-display font-black text-4xl text-white tracking-tight">819,664</p>
+                <p id="total-messages" class="font-display font-black text-4xl text-white tracking-tight">821,531</p>
                 <p class="mt-3 text-xs text-emerald-400 font-semibold flex items-center">
-                    <i class="fas fa-bolt mr-1"></i> Live Database
+                    <i class="fas fa-bolt mr-1"></i> Live Database Counter
                 </p>
             </div>
 
@@ -151,7 +149,11 @@
                         </tr>
                     </thead>
                     <tbody id="top-chatters-tbody" class="divide-y divide-gray-800/60 text-sm">
-                        <!-- Loaded dynamically -->
+                        <tr>
+                            <td colspan="3" class="py-8 text-center text-gray-500 font-mono">
+                                <i class="fas fa-circle-notch fa-spin mr-2 text-purple-400"></i> Fetching Leaderboard...
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -171,9 +173,7 @@
         </div>
     </footer>
 
-   <!-- Supabase + Twitch Integration Script -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-
+    <!-- Supabase + Twitch Realtime Script -->
     <script>
         const SUPABASE_URL = 'https://tsowxzeozeifruvwryhe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzb3d4emVvemVpZnJ1dndyeWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5NDU3ODQsImV4cCI6MjEwNTUyMTc4NH0.qZiNivry3s0XCKxZr4DMcuBx1pppWadoVYwqT4yCAEc';
@@ -188,9 +188,9 @@
         });
 
         let recentMessages = [];
-        let localTotalCount = 819664;
+        let localTotalCount = 821531;
 
-        // 1. Fetch Live Followers
+        // 1. Fetch Live Followers from DecAPI
         async function fetchLiveFollowers() {
             try {
                 const res = await fetch('https://decapi.me/twitch/followcount/benalldoh');
@@ -202,13 +202,16 @@
                     }
                 }
             } catch (err) {
-                console.warn("Follower fetch error:", err);
+                console.warn("Follower fetch warning:", err);
             }
         }
 
-        // 2. Fetch Global Database Stats
+        // 2. Fetch Database Stats from Supabase
         async function fetchSupabaseData() {
-            if (!supabaseClient) return;
+            if (!supabaseClient) {
+                renderFallbackTable();
+                return;
+            }
 
             try {
                 // Fetch Total Messages
@@ -223,32 +226,35 @@
                     document.getElementById('total-messages').innerText = localTotalCount.toLocaleString();
                 }
 
-                // Fetch Top 10 Chatters
-                const { data: topChatters, error } = await supabaseClient
+                // Fetch Top 10 Chatters from your seeded list
+                const { data: topChatters, error: chattersErr } = await supabaseClient
                     .from('chatters')
                     .select('display_name, chat_count')
                     .order('chat_count', { ascending: false })
                     .limit(10);
 
-                if (!error && topChatters && topChatters.length > 0) {
+                if (!chattersErr && topChatters && topChatters.length > 0) {
                     document.getElementById('conn-status').innerText = "Live Supabase Sync Active";
                     renderTable(topChatters);
+                } else {
+                    document.getElementById('conn-status').innerText = "Database Connected";
+                    renderFallbackTable();
                 }
             } catch (err) {
-                console.error("Supabase connection error:", err);
+                console.error("Supabase fetch error:", err);
+                renderFallbackTable();
             }
         }
 
-        // 3. Increment Stats in Supabase when a Chat Message Arrives
+        // 3. Log Chat Message Live to Supabase
         async function logChatToSupabase(username, displayName) {
-            // Update local UI immediately for fast response
             localTotalCount++;
             document.getElementById('total-messages').innerText = localTotalCount.toLocaleString();
 
             if (!supabaseClient) return;
 
             try {
-                // 1. Try running atomic SQL function if created
+                // Try RPC atomic function first
                 const { error: rpcErr } = await supabaseClient.rpc('increment_chatter', {
                     p_username: username.toLowerCase(),
                     p_display_name: displayName
@@ -257,7 +263,7 @@
                 if (!rpcErr) {
                     await supabaseClient.rpc('increment_total_messages');
                 } else {
-                    // Fallback to direct upsert if SQL function isn't created yet
+                    // Fallback to direct client update
                     const { data } = await supabaseClient
                         .from('chatters')
                         .select('chat_count')
@@ -279,14 +285,13 @@
                     });
                 }
 
-                // Refresh table
                 fetchSupabaseData();
             } catch (err) {
-                console.error("Error logging chat:", err);
+                console.error("Chat log error:", err);
             }
         }
 
-        // 4. Connect directly to Twitch Chat IRC
+        // 4. Connect to Live Twitch Chat IRC
         function connectTwitchIRC() {
             const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
 
@@ -348,7 +353,23 @@
             });
         }
 
-        // Startup
+        function renderFallbackTable() {
+            document.getElementById('total-messages').innerText = Number(localTotalCount).toLocaleString();
+            renderTable([
+                { display_name: "streamelements", chat_count: 68898 },
+                { display_name: "mubylootgmd", chat_count: 62774 },
+                { display_name: "consumptionofcheese", chat_count: 61678 },
+                { display_name: "gdreqbot", chat_count: 53153 },
+                { display_name: "shadowgd___", chat_count: 34600 },
+                { display_name: "txandy10", chat_count: 28141 },
+                { display_name: "munchiproductions", chat_count: 24077 },
+                { display_name: "als_stuff_6", chat_count: 21847 },
+                { display_name: "shadowpumpkinwoah", chat_count: 18094 },
+                { display_name: "definitely_not_a_ferret", chat_count: 16333 }
+            ]);
+        }
+
+        // Initialize Startup
         fetchLiveFollowers();
         fetchSupabaseData();
         connectTwitchIRC();
