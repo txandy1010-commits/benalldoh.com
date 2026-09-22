@@ -73,7 +73,7 @@
         <div class="text-center mb-12">
             <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-semibold uppercase tracking-widest mb-3">
                 <span class="w-2 h-2 rounded-full bg-green-400 pulse-dot"></span>
-                <span id="conn-status">Connecting to Database...</span>
+                <span id="conn-status">Connecting...</span>
             </div>
             <h2 class="font-display font-black text-4xl sm:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-500 glow-text uppercase">
                 BenAllDoh Live Stats
@@ -103,7 +103,7 @@
                 </div>
                 <p id="total-messages" class="font-display font-black text-4xl text-white tracking-tight">821,531</p>
                 <p class="mt-3 text-xs text-emerald-400 font-semibold flex items-center">
-                    <i class="fas fa-bolt mr-1"></i> Live Database Counter
+                    <i class="fas fa-bolt mr-1"></i> Live
                 </p>
             </div>
 
@@ -114,7 +114,7 @@
                     <i class="fas fa-tachometer-alt text-emerald-400 text-xl"></i>
                 </div>
                 <p id="msg-rate" class="font-display font-black text-4xl text-emerald-400 tracking-tight">0.00</p>
-                <p class="mt-3 text-xs text-gray-500">Live chat velocity</p>
+                <p class="mt-3 text-xs text-gray-500">Live chat speed</p>
             </div>
 
             <!-- Average Viewers -->
@@ -135,7 +135,7 @@
                     <h3 class="font-display font-bold text-xl text-white flex items-center">
                         <i class="fas fa-trophy text-yellow-500 mr-3"></i> Top 10 Chatters
                     </h3>
-                    <p class="text-xs text-gray-400 mt-1">Global leaderboard synced in real time for all devices</p>
+                    <p class="text-xs text-gray-400 mt-1">Global leaderboard</p>
                 </div>
             </div>
 
@@ -237,7 +237,7 @@
                     .limit(10);
 
                 if (!chattersErr && topChatters && topChatters.length > 0) {
-                    document.getElementById('conn-status').innerText = "Live Supabase Sync Active";
+                    document.getElementById('conn-status').innerText = "Live Stats";
                     renderTable(topChatters);
                 }
             } catch (err) {
