@@ -172,13 +172,16 @@
     </footer>
 
     <!-- Supabase Integration Script -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
     <script>
         const SUPABASE_URL = 'https://tsowxzeozeifruvwryhe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzb3d4emVvemVpZnJ1dndyeWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5NDU3ODQsImV4cCI6MjEwNTUyMTc4NH0.qZiNivry3s0XCKxZr4DMcuBx1pppWadoVYwqT4yCAEc';
 
-        let supabase = null;
+        // Renamed variable to 'supabaseClient' to avoid identifier collision
+        let supabaseClient = null;
         if (window.supabase && window.supabase.createClient) {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
 
         document.getElementById('mobile-menu-btn').addEventListener('click', function() {
@@ -197,20 +200,20 @@
                     }
                 }
             } catch (err) {
-                console.warn("DecAPI limit reached, using cached counter.");
+                console.warn("Follower count fetch error:", err);
             }
         }
 
-        // 2. Fetch Global Database Stats
+        // 2. Fetch Database Stats
         async function fetchSupabaseData() {
-            if (!supabase) {
+            if (!supabaseClient) {
                 renderFallbackTable();
                 return;
             }
 
             try {
-                // Get Total Messages
-                const { data: statsData } = await supabase
+                // Fetch Total Messages
+                const { data: statsData, error: statsErr } = await supabaseClient
                     .from('channel_stats')
                     .select('stat_value')
                     .eq('stat_key', 'total_messages')
@@ -220,22 +223,22 @@
                     document.getElementById('total-messages').innerText = Number(statsData.stat_value).toLocaleString();
                 }
 
-                // Get Top 10 Chatters
-                const { data: topChatters, error } = await supabase
+                // Fetch Top Chatters
+                const { data: topChatters, error: chattersErr } = await supabaseClient
                     .from('chatters')
                     .select('display_name, chat_count')
                     .order('chat_count', { ascending: false })
                     .limit(10);
 
-                if (!error && topChatters && topChatters.length > 0) {
+                if (!chattersErr && topChatters && topChatters.length > 0) {
                     document.getElementById('conn-status').innerText = "Live Supabase Sync Active";
                     renderTable(topChatters);
                 } else {
-                    document.getElementById('conn-status').innerText = "24/7 Sync Engine Active";
+                    document.getElementById('conn-status').innerText = "Database Connected";
                     renderFallbackTable();
                 }
             } catch (err) {
-                console.error("Supabase fetch error:", err);
+                console.error("Supabase connection error:", err);
                 renderFallbackTable();
             }
         }
@@ -276,7 +279,6 @@
         fetchLiveFollowers();
         fetchSupabaseData();
 
-        // Intervals for polling
         setInterval(fetchLiveFollowers, 10000);
         setInterval(fetchSupabaseData, 5000);
     </script>
