@@ -171,14 +171,13 @@
         </div>
     </footer>
 
-    <!-- Supabase Integration Script -->
+   <!-- Supabase + Twitch Integration Script -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
     <script>
         const SUPABASE_URL = 'https://tsowxzeozeifruvwryhe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzb3d4emVvemVpZnJ1dndyeWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5NDU3ODQsImV4cCI6MjEwNTUyMTc4NH0.qZiNivry3s0XCKxZr4DMcuBx1pppWadoVYwqT4yCAEc';
 
-        // Renamed variable to 'supabaseClient' to avoid identifier collision
         let supabaseClient = null;
         if (window.supabase && window.supabase.createClient) {
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -188,7 +187,10 @@
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
-        // 1. Fetch Live Followers safely
+        let recentMessages = [];
+        let localTotalCount = 819664;
+
+        // 1. Fetch Live Followers
         async function fetchLiveFollowers() {
             try {
                 const res = await fetch('https://decapi.me/twitch/followcount/benalldoh');
@@ -200,47 +202,133 @@
                     }
                 }
             } catch (err) {
-                console.warn("Follower count fetch error:", err);
+                console.warn("Follower fetch error:", err);
             }
         }
 
-        // 2. Fetch Database Stats
+        // 2. Fetch Global Database Stats
         async function fetchSupabaseData() {
-            if (!supabaseClient) {
-                renderFallbackTable();
-                return;
-            }
+            if (!supabaseClient) return;
 
             try {
                 // Fetch Total Messages
-                const { data: statsData, error: statsErr } = await supabaseClient
+                const { data: statsData } = await supabaseClient
                     .from('channel_stats')
                     .select('stat_value')
                     .eq('stat_key', 'total_messages')
                     .maybeSingle();
 
                 if (statsData && statsData.stat_value) {
-                    document.getElementById('total-messages').innerText = Number(statsData.stat_value).toLocaleString();
+                    localTotalCount = Number(statsData.stat_value);
+                    document.getElementById('total-messages').innerText = localTotalCount.toLocaleString();
                 }
 
-                // Fetch Top Chatters
-                const { data: topChatters, error: chattersErr } = await supabaseClient
+                // Fetch Top 10 Chatters
+                const { data: topChatters, error } = await supabaseClient
                     .from('chatters')
                     .select('display_name, chat_count')
                     .order('chat_count', { ascending: false })
                     .limit(10);
 
-                if (!chattersErr && topChatters && topChatters.length > 0) {
+                if (!error && topChatters && topChatters.length > 0) {
                     document.getElementById('conn-status').innerText = "Live Supabase Sync Active";
                     renderTable(topChatters);
-                } else {
-                    document.getElementById('conn-status').innerText = "Database Connected";
-                    renderFallbackTable();
                 }
             } catch (err) {
                 console.error("Supabase connection error:", err);
-                renderFallbackTable();
             }
+        }
+
+        // 3. Increment Stats in Supabase when a Chat Message Arrives
+        async function logChatToSupabase(username, displayName) {
+            // Update local UI immediately for fast response
+            localTotalCount++;
+            document.getElementById('total-messages').innerText = localTotalCount.toLocaleString();
+
+            if (!supabaseClient) return;
+
+            try {
+                // 1. Try running atomic SQL function if created
+                const { error: rpcErr } = await supabaseClient.rpc('increment_chatter', {
+                    p_username: username.toLowerCase(),
+                    p_display_name: displayName
+                });
+
+                if (!rpcErr) {
+                    await supabaseClient.rpc('increment_total_messages');
+                } else {
+                    // Fallback to direct upsert if SQL function isn't created yet
+                    const { data } = await supabaseClient
+                        .from('chatters')
+                        .select('chat_count')
+                        .eq('username', username.toLowerCase())
+                        .maybeSingle();
+
+                    const currentCount = data ? data.chat_count : 0;
+
+                    await supabaseClient.from('chatters').upsert({
+                        username: username.toLowerCase(),
+                        display_name: displayName,
+                        chat_count: currentCount + 1,
+                        last_updated: new Date().toISOString()
+                    });
+
+                    await supabaseClient.from('channel_stats').upsert({
+                        stat_key: 'total_messages',
+                        stat_value: localTotalCount
+                    });
+                }
+
+                // Refresh table
+                fetchSupabaseData();
+            } catch (err) {
+                console.error("Error logging chat:", err);
+            }
+        }
+
+        // 4. Connect directly to Twitch Chat IRC
+        function connectTwitchIRC() {
+            const socket = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+
+            socket.onopen = function() {
+                socket.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
+                socket.send('NICK justinfan' + Math.floor(Math.random() * 89999 + 10000));
+                socket.send('JOIN #benalldoh');
+            };
+
+            socket.onmessage = function(event) {
+                const message = event.data;
+
+                if (message.startsWith('PING')) {
+                    socket.send('PONG :tmi.twitch.tv');
+                    return;
+                }
+
+                if (message.includes('PRIVMSG #benalldoh')) {
+                    let displayName = "Anonymous";
+
+                    const tagMatch = message.match(/display-name=([^;]+)/);
+                    if (tagMatch && tagMatch[1]) {
+                        displayName = tagMatch[1];
+                    } else {
+                        const userMatch = message.match(/:([^!]+)!/);
+                        if (userMatch && userMatch[1]) displayName = userMatch[1];
+                    }
+
+                    recentMessages.push(Date.now());
+                    logChatToSupabase(displayName.toLowerCase(), displayName);
+                }
+            };
+
+            socket.onclose = function() { 
+                setTimeout(connectTwitchIRC, 3000); 
+            };
+        }
+
+        function updateMPS() {
+            const now = Date.now();
+            recentMessages = recentMessages.filter(ts => now - ts <= 5000);
+            document.getElementById('msg-rate').innerText = (recentMessages.length / 5).toFixed(2);
         }
 
         function renderTable(chatters) {
@@ -260,27 +348,14 @@
             });
         }
 
-        function renderFallbackTable() {
-            renderTable([
-                { display_name: "L1medd", chat_count: 18420 },
-                { display_name: "KingTheGreat_", chat_count: 14210 },
-                { display_name: "gloinkinkk_", chat_count: 11950 },
-                { display_name: "GD_Lumo", chat_count: 9840 },
-                { display_name: "SeannnnGD", chat_count: 8630 },
-                { display_name: "MomAllDoh", chat_count: 7420 },
-                { display_name: "DashMaster99", chat_count: 6100 },
-                { display_name: "CubingPRO", chat_count: 5490 },
-                { display_name: "BenSMP_Fan", chat_count: 4820 },
-                { display_name: "GarticKing", chat_count: 4210 }
-            ]);
-        }
-
-        // Initialize immediately
+        // Startup
         fetchLiveFollowers();
         fetchSupabaseData();
+        connectTwitchIRC();
 
         setInterval(fetchLiveFollowers, 10000);
-        setInterval(fetchSupabaseData, 5000);
+        setInterval(fetchSupabaseData, 8000);
+        setInterval(updateMPS, 1000);
     </script>
 </body>
 </html>
