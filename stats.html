@@ -164,7 +164,7 @@
     <footer class="bg-darkBg border-t border-gray-800 py-8 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
             <div class="mb-4 md:mb-0 text-center md:text-left">
-                &copy; 2026 BenAllDoh. All rights reserved.
+                &copy; 2026 BenAllDoh. All rights reserved. *Info May be Incorrect but it is Close Enough
             </div>
             <div class="flex space-x-6 text-lg">
                 <a href="https://twitch.tv/benalldoh" target="_blank" class="hover:text-twitch transition-colors" aria-label="Twitch"><i class="fab fa-twitch"></i></a>
@@ -237,7 +237,7 @@
                     .limit(10);
 
                 if (!chattersErr && topChatters && topChatters.length > 0) {
-                    document.getElementById('conn-status').innerText = "Live Stats";
+                    document.getElementById('conn-status').innerText = "Live Stats*";
                     renderTable(topChatters);
                 }
             } catch (err) {
